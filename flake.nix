@@ -44,16 +44,15 @@
       '';
     };
     # ----------------------------
-    # Radarr version: the real product version is embedded in Core.dll as
-    # the assembly reference "Radarr.Common, Version=N.N.N.N" (consistent
-    # across Servarr apps). Exposed as the `version` output for CI tagging.
+    # Radarr version: read the product version from the assembly manifest of
+    # Radarr.Core.dll via monodis (the proper tool, robust vs string scraping).
+    # Exposed as the `version` output for CI tagging.
     # ----------------------------
     radarrVersion = pkgs.runCommand "radarr-version" {
-      nativeBuildInputs = [ pkgs.binutils ];
+      nativeBuildInputs = [ pkgs.mono ];
     } ''
-      strings ${radarr}/app/Radarr/Radarr.Core.dll \
-        | grep -oE 'Radarr\.Common, Version=[0-9.]+' \
-        | head -n1 | sed 's/.*Version=//' | tr -d '\n' > $out
+      monodis --assembly ${radarr}/app/Radarr/Radarr.Core.dll \
+        | awk '$1 == "Version:" { print $2; exit }' | tr -d '\n' > $out
     '';
     # ----------------------------
     # User database configuration (/etc/passwd)
