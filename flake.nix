@@ -44,15 +44,16 @@
       '';
     };
     # ----------------------------
-    # Radarr version: real product version lives in Common.dll's
-    # fileVersion in the bundled deps.json (the library key is a
-    # hardcoded 1.0.0). Exposed as the `version` output for CI tagging.
+    # Radarr version: the real product version is embedded in Core.dll as
+    # the assembly reference "Radarr.Common, Version=N.N.N.N" (consistent
+    # across Servarr apps). Exposed as the `version` output for CI tagging.
     # ----------------------------
     radarrVersion = pkgs.runCommand "radarr-version" {
-      nativeBuildInputs = [ pkgs.jq ];
+      nativeBuildInputs = [ pkgs.binutils ];
     } ''
-      jq -r '[.targets[][]?.runtime? // {} | to_entries[] | select(.key=="Radarr.Common.dll") | .value.fileVersion] | map(select(.!=null)) | first' \
-        ${radarr}/app/Radarr/Radarr.deps.json | tr -d '\n' > $out
+      strings ${radarr}/app/Radarr/Radarr.Core.dll \
+        | grep -oE 'Radarr\.Common, Version=[0-9.]+' \
+        | head -n1 | sed 's/.*Version=//' | tr -d '\n' > $out
     '';
     # ----------------------------
     # User database configuration (/etc/passwd)
