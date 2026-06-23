@@ -36,13 +36,14 @@
     "radarr-src": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-CeHQyA/7Vb1fyCCqHg/YbQ1lV7tKR0NQUv5Zqicxth8=",
-        "type": "file",
-        "url": "https://radarr.servarr.com/v1/update/master/updatefile?arch=x64&os=linux&runtime=netcore"
+        "lastModified": 1781024798,
+        "narHash": "sha256-h4L/eXQUNoydj+8NCDDiWY4jT0jeyVwap+VSNbCAE9g=",
+        "type": "tarball",
+        "url": "https://radarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64"
       },
       "original": {
-        "type": "file",
-        "url": "https://radarr.servarr.com/v1/update/master/updatefile?arch=x64&os=linux&runtime=netcore"
+        "type": "tarball",
+        "url": "https://radarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64"
       }
     },
     "root": {
