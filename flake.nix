@@ -4,6 +4,7 @@
     nixpkgs.follows = "minimalbase/nixpkgs";
     minimalbase.url = "github:nonrootdocker/minimalbase";
     radarr-src = {
+      type = "tarball";
       url = "https://radarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64";
       flake = false;
     };
@@ -23,7 +24,7 @@
     # ----------------------------
     radarr = pkgs.stdenv.mkDerivation {
       pname = "radarr";
-      version = "latest";
+      version = "release";
       src = radarr-src;
       nativeBuildInputs = [
         pkgs.autoPatchelfHook
@@ -37,14 +38,22 @@
         pkgs.lttng-ust_2_12
         pkgs.stdenv.cc.cc.lib
       ];
-      unpackPhase = ''
-        tar -xzf $src
-      '';
       installPhase = ''
-        mkdir -p $out/app
-        cp -r . $out/app/
+        mkdir -p $out/app/Radarr
+        cp -r . $out/app/Radarr/
       '';
     };
+    # ----------------------------
+    # Radarr version: read the product version from the assembly manifest of
+    # Radarr.Core.dll via monodis (the proper tool, robust vs string scraping).
+    # Exposed as the `version` output for CI tagging.
+    # ----------------------------
+    radarrVersion = pkgs.runCommand "radarr-version" {
+      nativeBuildInputs = [ pkgs.mono ];
+    } ''
+      monodis --assembly ${radarr}/app/Radarr/Radarr.Core.dll \
+        | awk '$1 == "Version:" { print $2; exit }' | tr -d '\n' > $out
+    '';
     # ----------------------------
     # User database configuration (/etc/passwd)
     # ----------------------------
@@ -72,8 +81,9 @@
   in {
     packages.${system} = {
       default = self.packages.${system}.radarr-image;
+      version = radarrVersion;
       radarr-image = pkgs.dockerTools.buildImage {
-        name = "minimalbase";
+        name = "radarr";
         tag = "latest";
         fromImage = minimalbase.packages.${system}.base-image;
         copyToRoot = pkgs.buildEnv {
