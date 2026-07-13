@@ -36,8 +36,8 @@
     "radarr-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1781024798,
-        "narHash": "sha256-h4L/eXQUNoydj+8NCDDiWY4jT0jeyVwap+VSNbCAE9g=",
+        "lastModified": 1783868971,
+        "narHash": "sha256-DUMj55xAjJTNYPVzmstgMy2Wm8RtuKI10fyhYxjkPBA=",
         "type": "tarball",
         "url": "https://radarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64"
       },
